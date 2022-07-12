@@ -146,6 +146,15 @@ function motorhub_scripts() {
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
+
+	wp_enqueue_style( 'bootstrap-style', get_stylesheet_directory_uri() . '/assets/css/bootstrap.min.css', array(), _S_VERSION );
+	wp_enqueue_script( 'bootstrap-script', get_stylesheet_directory_uri() . '/assets/js/bootstrap.bundle.min.js', array(), _S_VERSION, true );
+
+	wp_enqueue_style( 'swiper-style', get_stylesheet_directory_uri() . '/assets/css/swiper-bundle.min.css', array(), _S_VERSION );
+	wp_enqueue_script( 'swiper-script', get_stylesheet_directory_uri() . '/assets/js/swiper-bundle.min.js', array(), _S_VERSION, true );
+
+	wp_enqueue_style( 'motorhub-main-style', get_stylesheet_directory_uri() . '/assets/css/motorhub.css', array(), _S_VERSION );
+	wp_enqueue_script( 'motorhub-main-script', get_stylesheet_directory_uri() . '/assets/js/motorhub.js', array(), _S_VERSION, true );
 }
 add_action( 'wp_enqueue_scripts', 'motorhub_scripts' );
 
@@ -182,3 +191,23 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 if ( class_exists( 'WooCommerce' ) ) {
 	require get_template_directory() . '/inc/woocommerce.php';
 }
+
+/**
+ * Products per page
+ */
+define('PRODUCTS_PER_PAGE', 5);
+
+/**
+ * Posts per page for archive
+ * prevent 404 if posts per page on main query
+ * is greater than the posts per page for product archive
+ *
+ */
+
+function mh_change_archive_per_page( $query ) {
+	//* any post type main archive
+	if ( $query->is_main_query() && ! is_admin() && is_post_type_archive( 'product' ) ) {
+		$query->set( 'posts_per_page', PRODUCTS_PER_PAGE );
+	}
+}
+add_action( 'pre_get_posts', 'mh_change_archive_per_page' );
